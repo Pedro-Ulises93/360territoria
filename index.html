@@ -10,9 +10,58 @@
 <div id="panorama" style="width:100%; height:100vh;"></div>
 
 <script>
+    // Function to convert GitHub blob URL to raw URL
+    function convertGitHubUrl(url) {
+        if (!url) return null;
+        
+        // If it's already a raw URL, return as is
+        if (url.includes('/raw/')) {
+            return url;
+        }
+        
+        // Convert blob URL to raw URL
+        // https://github.com/user/repo/blob/branch/path/to/image.jpg
+        // -> https://github.com/user/repo/raw/branch/path/to/image.jpg
+        if (url.includes('github.com') && url.includes('/blob/')) {
+            return url.replace('/blob/', '/raw/');
+        }
+        
+        return url;
+    }
+    
+    // Parse URL parameters and hash
+    const urlParams = new URLSearchParams(window.location.search);
+    const hash = window.location.hash.substring(1); // Remove the # symbol
+    let panoramaImage = "IPSA.jpg"; // Default fallback
+    
+    // Priority 1: Check URL hash for direct GitHub URL (for copy-paste)
+    if (hash) {
+        const decodedHash = decodeURIComponent(hash);
+        // Check if it looks like a GitHub URL
+        if (decodedHash.includes('github.com')) {
+            panoramaImage = convertGitHubUrl(decodedHash);
+        } else if (decodedHash.startsWith('http://') || decodedHash.startsWith('https://')) {
+            // Any other HTTP(S) URL in hash
+            panoramaImage = decodedHash;
+        } else {
+            // Treat as relative filename
+            panoramaImage = decodedHash;
+        }
+    }
+    // Priority 2: Check for 'url' parameter (full GitHub raw URL)
+    else if (urlParams.get('url') || urlParams.get('u')) {
+        const urlParam = urlParams.get('url') || urlParams.get('u');
+        panoramaImage = convertGitHubUrl(urlParam);
+    }
+    // Priority 3: Check for 'image' parameter (relative filename in same repo)
+    else if (urlParams.get('image')) {
+        panoramaImage = urlParams.get('image');
+    }
+    
+    // Initialize Pannellum viewer with dynamic image
     pannellum.viewer('panorama', {
         "type": "equirectangular",
-        "panorama": "IPSA.jpg",
+        "panorama": panoramaImage,
         "autoLoad": true,
         "autoRotate": -2,
         "hfov": 110
