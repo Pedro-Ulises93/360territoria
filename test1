@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Living Room 360</title>
+    <script type="text/javascript" src="pannellum.js"></script>
+    <link rel="stylesheet" type="text/css" href="pannellum.css">
+</head>
+<body style="margin:0;">
+<div id="panorama" style="width:100%; height:100vh;"></div>
+
+<script>
+    pannellum.viewer('panorama', {
+        "type": "equirectangular",
+        "panorama": "IPSA.jpg",
+        "autoLoad": true,
+        "autoRotate": -2,
+        "hfov": 110
+    });
+</script>
+
+</body>
+</html>
